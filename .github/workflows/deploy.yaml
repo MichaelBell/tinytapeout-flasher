@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - tinyQV
 
 jobs:
   deploy:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: tinyQV
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
