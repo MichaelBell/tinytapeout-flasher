@@ -14,7 +14,7 @@ export function ReplPanel(props: IReplPanelProps) {
   let terminal: Terminal;
 
   onMount(async () => {
-    terminal = new Terminal({});
+    terminal = new Terminal({ rows: 26 });
     const fitAddon = new FitAddon();
     terminal.loadAddon(fitAddon);
 

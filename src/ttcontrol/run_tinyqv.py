@@ -526,7 +526,7 @@ def run(query=False, stop=False):
                 uart.write(c)
                 uart.write(c)
 
-            uart_data = uart.read()
+            uart_data = uart.read(128)
             if uart_data:
                 sys.stdout.write(uart_data)
 
