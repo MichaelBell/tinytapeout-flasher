@@ -75,6 +75,7 @@ export function FlashPanel(props: IReplPanelProps) {
         await props.device.programFlash(flashOffset(), buffer, (progress) => {
           setCustomProgress(progress);
         });
+        setProgrammingCompleted(true);
         return;
       }
 
@@ -118,6 +119,9 @@ export function FlashPanel(props: IReplPanelProps) {
 
   return (
     <Stack spacing={1}>
+      <Show when={programmingCompleted()}>
+        <ReplPanel device={props.device} />
+      </Show>
       <FormControl>
         <FormLabel id="demo-radio-buttons-group-label">Firmware</FormLabel>
         <RadioGroup
@@ -218,9 +222,6 @@ export function FlashPanel(props: IReplPanelProps) {
       <Button variant="contained" onClick={doFlash} disabled={programming()}>
         Flash
       </Button>
-      <Show when={programmingCompleted()}>
-        <ReplPanel device={props.device} />
-      </Show>
     </Stack>
   );
 }

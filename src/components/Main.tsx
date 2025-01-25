@@ -21,9 +21,6 @@ export function Main(props: IMainProps) {
       <Stack direction="row" spacing={1} marginBottom={2} alignItems="center">
         <Stack flex={1} marginRight={1}>
           <Typography>
-            Firmware: <strong>{props.device.data.version ?? '<unknown>'}</strong>
-          </Typography>
-          <Typography>
             Flash ID: <code>{props.device.data.flashId ?? 'not detected'}</code>
           </Typography>
         </Stack>

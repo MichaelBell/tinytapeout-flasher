@@ -11,7 +11,7 @@ export function Header() {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div">
-          Tiny Tapeout Flasher
+          TinyQV Programmer
         </Typography>
         <Box flexGrow={1} />
         <IconButton
