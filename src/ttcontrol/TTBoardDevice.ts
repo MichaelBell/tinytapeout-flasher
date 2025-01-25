@@ -211,6 +211,11 @@ export class TTBoardDevice extends EventTarget {
     }
   }
 
+  async runExistingProgram() {
+    await this.sendCommand(`run()`);
+    await this.waitUntil((line) => line.startsWith('design='));
+  }
+
   private async run() {
     const { port } = this;
 

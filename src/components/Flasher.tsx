@@ -117,6 +117,12 @@ export function FlashPanel(props: IReplPanelProps) {
     }
   };
 
+  const doRun = async () => {
+    setProgrammingCompleted(false);
+    await props.device.runExistingProgram();
+    setProgrammingCompleted(true);
+  };
+
   const linkTo = (preset: any) => {
     if ('source' in preset) return <a href={preset.source}>{preset.name}</a>;
     else return preset.name;
@@ -228,9 +234,14 @@ export function FlashPanel(props: IReplPanelProps) {
           <Typography>✅ Flashing complete</Typography>
         </Show>
       </Show>
-      <Button variant="contained" onClick={doFlash} disabled={programming()}>
-        Flash
-      </Button>
+      <Stack direction="row" spacing={1}>
+        <Button variant="contained" onClick={doFlash} disabled={programming()}>
+          Flash and Run
+        </Button>
+        <Button variant="contained" onClick={doRun} disabled={programming()}>
+          Run
+        </Button>
+      </Stack>
     </Stack>
   );
 }
