@@ -4,17 +4,13 @@
 
 export const presets = [
   {
-    name: 'KianV uLinux Image (TT06)',
-    baseUrl: 'https://urish.github.io/tt-kian-riscv-firmware/',
-    files: [
-      { offset: 1048576, name: 'bootloader.bin' },
-      { offset: 1572864, name: 'kianv.dtb' },
-      { offset: 2097152, name: 'Image' },
-    ],
+    name: 'Hello World',
+    baseUrl: 'https://tt.rebel-lion.uk/tt06-tinyqv/',
+    files: [{ offset: 0, name: 'hello.bin' }],
   },
   {
-    name: 'Run Length Encoded Bad Apple Video (TT07)',
-    baseUrl: 'https://tt.rebel-lion.uk/',
-    files: [{ offset: 0, name: 'tt07-badapple640x480.bin' }],
+    name: 'Micropython',
+    baseUrl: 'https://tt.rebel-lion.uk/tt06-tinyqv/',
+    files: [{ offset: 0, name: 'micropython20250107.bin' }],
   },
 ];

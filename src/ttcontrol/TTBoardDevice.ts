@@ -4,8 +4,7 @@
 
 import { createStore } from 'solid-js/store';
 import { LineBreakTransformer } from '~/utils/LineBreakTransformer';
-import ttInit from './ttinit.py?raw';
-import ttFlash from './ttflash.py?raw';
+import ttRunTinyQV from './run_tinyqv.py?raw';
 
 export interface ILogEntry {
   sent: boolean;
@@ -128,31 +127,27 @@ export class TTBoardDevice extends EventTarget {
     const textEncoderStream = new TextEncoderStream();
     this.writer = textEncoderStream.writable.getWriter();
     this.writableStreamClosed = textEncoderStream.readable.pipeTo(this.port.writable);
-    if (this.data.version == null) {
-      await this.writeText('\n'); // Send a newlines to get REPL prompt.
-      await this.writeText('print(f"tt.sdk_version={tt.version}")\r\n');
-      await new Promise((resolve) => setTimeout(resolve, 100)); // Wait for the response.
-    }
-    if (this.data.boot) {
-      // Wait for the board to finish booting, up to 6 seconds:
-      for (let i = 0; i < 60; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        if (this.data.version) {
-          break;
-        }
+
+    /*const lineListener = this.addLineListener((line) => {
+      if (line.startsWith('BOOT:')) {
+        this.writeText('\x03');
       }
-    }
-    if (this.data.version == null) {
-      // The following sequence tries to ensure clean reboot:
-      // Send Ctrl+C twice to stop any running program,
-      // followed by Ctrl+B to exit RAW REPL mode (if it was entered),
-      // and finally Ctrl+D to soft reset the board.
-      await this.writeText('\x03\x03\x02');
-      await this.writeText('\x04');
-    }
+    });*/
+
+    // The following sequence tries to ensure clean reboot:
+    // Send Ctrl+C twice to stop any running program,
+    // followed by Ctrl+B to exit RAW REPL mode (if it was entered),
+    // and finally Ctrl+D to soft reset the board.
+    await this.writeText('\x03\x03\x02');
+    await this.writeText('\x04');
+
+    await this.waitUntil((line) => line.startsWith('MPY: soft reboot'));
+    await new Promise((f) => setTimeout(f, 100));
+
+    await this.writeText('\x03\x03');
+
     await this.writeText('\x01'); // Send Ctrl+A to enter RAW REPL mode.
-    await this.writeText(ttInit + '\x04'); // Send the ttinit.py script and execute it.
-    await this.writeText(ttFlash + '\x04'); // Send the ttflash.py script and execute it.
+    await this.writeText(ttRunTinyQV + '\x04'); // Send the run_tinyqv.py script and execute it.
   }
 
   async programFlash(
@@ -178,7 +173,7 @@ export class TTBoardDevice extends EventTarget {
       const fileData = new Uint8Array(data);
       const startOffset = `0x${offset.toString(16)}`;
       const flashProgPromise = waitForFlashProg();
-      await this.sendCommand(`flash.program_sectors(${startOffset})`);
+      await this.sendCommand(`program_flash(${startOffset})`);
       await flashProgPromise;
       for (let i = 0; i < fileData.length; i += sectorSize) {
         // measured transport speed: 92kb/sec
@@ -189,6 +184,8 @@ export class TTBoardDevice extends EventTarget {
       }
       await this.writeBinary(new TextEncoder().encode(`0\r\n`));
       const response = await waitForFlashProg();
+
+      await this.sendCommand(`run()`);
     } finally {
       lineListener.abort();
     }
