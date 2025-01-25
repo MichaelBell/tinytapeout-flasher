@@ -1,4 +1,5 @@
 import time
+import uselect
 import sys
 import rp2
 import gc
@@ -393,8 +394,8 @@ def setup_pmod():
         if i >= 4:
             d = buf[i]
             nibble = ((d >> 1) & 1) | ((d >> 1) & 2) | ((d >> 2) & 0x4) | ((d >> 2) & 0x8)
-            print("%01x" % (nibble,), end="")
-    print()
+            #print("%01x" % (nibble,), end="")
+    #print()
         
     sm.put(0b11111111)
     sm.put(0b11001001)  # Directions
@@ -417,6 +418,7 @@ def run(query=False, stop=False):
     Pin(GPIO_UIO[6], Pin.IN, pull=Pin.PULL_UP)
     Pin(GPIO_UIO[7], Pin.IN, pull=Pin.PULL_UP)
 
+    print()
     select_design(227)
 
     if query:
@@ -501,7 +503,7 @@ def run(query=False, stop=False):
     if query:
         input("Start? ")
 
-    #uart = UART(0, baudrate=115200, tx=Pin(0), rx=Pin(1))
+    uart = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]))
     time.sleep(0.001)
     clk = PWM(Pin(GPIO_PROJECT_CLK), freq=64_000_000, duty_u16=32768)
 
@@ -512,30 +514,23 @@ def run(query=False, stop=False):
     sm.active(0)
     del sm
 
-    if not stop:
-        return
+    if True:
+        poll = uselect.poll()
+        poll.register(sys.stdin, uselect.POLLIN)
 
-    #if query:
-    #    input("Stop? ")
-    
-    del clk
-    rst_n.init(Pin.IN, pull=Pin.PULL_DOWN)
-    clk = Pin(Pin.IN, pull=Pin.PULL_DOWN)
+        while True:
+            if poll.poll(0):
+                c = sys.stdin.buffer.read(1)
+
+                # Repeat the character to workaround TinyQV bug
+                uart.write(c)
+                uart.write(c)
+
+            uart_data = uart.read()
+            if uart_data:
+                sys.stdout.write(uart_data)
 
     if False:
-        while True:
-            data = uart.read(16)
-            if data is not None:
-                for d in data:
-                    if d > 0 and d <= 127:
-                        print(chr(d), end="")
-
-        for i in range(len(buf)):
-            print("%02x " % (buf[i],), end = "")
-            if (i & 7) == 7:
-                print()
-
-    if True:
         for j in range(8):
             print("%02d: " % (j+21,), end="")
             for d in buf:

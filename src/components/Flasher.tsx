@@ -23,6 +23,7 @@ import { createStore } from 'solid-js/store';
 import { presets } from '~/config/presets';
 import { TTBoardDevice } from '~/ttcontrol/TTBoardDevice';
 import { MB, toKB } from '~/utils/sizes';
+import { ReplPanel } from './Console';
 
 export interface IReplPanelProps {
   device: TTBoardDevice;
@@ -44,6 +45,7 @@ export function FlashPanel(props: IReplPanelProps) {
   const [selectedFirmware, setSelectedFirmware] = createSignal('0');
   const [flashOffset, setFlashOffset] = createSignal(0);
   const [programming, setProgramming] = createSignal(false);
+  const [programmingCompleted, setProgrammingCompleted] = createSignal(false);
   const [customSize, setCustomSize] = createSignal(0);
   const [customProgress, setCustomProgress] = createSignal(0);
   const [fileStatus, setFileStatus] = createStore([] as Array<IFileFlashStatus>);
@@ -58,6 +60,7 @@ export function FlashPanel(props: IReplPanelProps) {
 
   const doFlash = async () => {
     try {
+      setProgrammingCompleted(false);
       setProgramming(true);
       setFileStatus([]);
 
@@ -106,6 +109,8 @@ export function FlashPanel(props: IReplPanelProps) {
           status: `✅ ${toKB(data.byteLength)} kB`,
         });
       }
+
+      setProgrammingCompleted(true);
     } finally {
       setProgramming(false);
     }
@@ -213,6 +218,9 @@ export function FlashPanel(props: IReplPanelProps) {
       <Button variant="contained" onClick={doFlash} disabled={programming()}>
         Flash
       </Button>
+      <Show when={programmingCompleted()}>
+        <ReplPanel device={props.device} />
+      </Show>
     </Stack>
   );
 }

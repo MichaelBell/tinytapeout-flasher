@@ -23,7 +23,14 @@ export class TTBoardDevice extends EventTarget {
   private writer?: WritableStreamDefaultWriter<string>;
   private binaryWriter?: WritableStreamDefaultWriter<Uint8Array>;
 
+  private terminalDetachedPromise? = Promise.resolve();
+  private terminalDetachedResolve?: () => void;
+  get terminalDetached() {
+    return this.terminalDetachedPromise;
+  }
+
   readonly data;
+  private terminalListener: TerminalListener | null = null;
   private setData;
 
   constructor(readonly port: SerialPort) {
@@ -61,6 +68,24 @@ export class TTBoardDevice extends EventTarget {
       this.binaryWriter = this.port.writable.getWriter();
     }
     await this.binaryWriter.write(data);
+  }
+
+  async attachTerminal(listener: TerminalListener) {
+    this.terminalDetachedPromise = new Promise((resolve) => {
+      this.terminalDetachedResolve = resolve;
+    });
+    this.terminalListener = listener;
+  }
+
+  async detachTerminal() {
+    this.terminalListener = null;
+    await this.writeText('\x03\x03'); // Send Ctrl+C twice to stop any running program.
+    await this.writeText('\x01'); // Send Ctrl+A to enter RAW REPL mode.
+    this.terminalDetachedResolve?.();
+  }
+
+  async terminalWrite(data: string) {
+    await this.writeText(data);
   }
 
   private addLogEntry(entry: ILogEntry) {
@@ -128,12 +153,6 @@ export class TTBoardDevice extends EventTarget {
     this.writer = textEncoderStream.writable.getWriter();
     this.writableStreamClosed = textEncoderStream.readable.pipeTo(this.port.writable);
 
-    /*const lineListener = this.addLineListener((line) => {
-      if (line.startsWith('BOOT:')) {
-        this.writeText('\x03');
-      }
-    });*/
-
     // The following sequence tries to ensure clean reboot:
     // Send Ctrl+C twice to stop any running program,
     // followed by Ctrl+B to exit RAW REPL mode (if it was entered),
@@ -186,6 +205,7 @@ export class TTBoardDevice extends EventTarget {
       const response = await waitForFlashProg();
 
       await this.sendCommand(`run()`);
+      await this.waitUntil((line) => line.startsWith('design='));
     } finally {
       lineListener.abort();
     }
@@ -209,9 +229,13 @@ export class TTBoardDevice extends EventTarget {
     while (port.readable) {
       const textDecoder = new TextDecoderStream();
       this.readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-      this.reader = textDecoder.readable
+      const [stream1, stream2] = textDecoder.readable.tee();
+      this.reader = stream1
         .pipeThrough(new TransformStream(new LineBreakTransformer()))
         .getReader();
+
+      this.terminalReader = stream2.getReader();
+      this.processTerminalStream(this.terminalReader);
 
       try {
         // eslint-disable-next-line no-constant-condition
@@ -221,7 +245,7 @@ export class TTBoardDevice extends EventTarget {
             this.reader.releaseLock();
             return;
           }
-          if (value) {
+          if (value && !this.terminalListener) {
             const cleanValue = cleanupRawREPL(value);
             this.processInput(cleanValue);
             this.addLogEntry({ text: cleanValue, sent: false });
@@ -232,6 +256,22 @@ export class TTBoardDevice extends EventTarget {
         this.dispatchEvent(new Event('close'));
       } finally {
         this.reader.releaseLock();
+      }
+    }
+  }
+
+  async processTerminalStream(reader: ReadableStreamDefaultReader<string>) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        reader.releaseLock();
+        return;
+      }
+      if (value) {
+        if (this.terminalListener) {
+          this.terminalListener(value);
+        }
       }
     }
   }

@@ -57,11 +57,11 @@ export function App() {
 
         <Stack maxWidth="100%" width={600} flex="1" py={2}>
           <Typography variant="h6" component="div">
-            Flash your QSPI Pmod with a new firmware
+            Run TinyQV binaries on TT06 with QSPI Pmod
           </Typography>
 
           <Typography variant="body1" color="text.secondary" gutterBottom>
-            For Tiny Tapeout demo board with a QSPI Pmod attached.
+            For Tiny Tapeout 06 demo board with a QSPI Pmod attached.
           </Typography>
 
           <Show when={!supported()}>
