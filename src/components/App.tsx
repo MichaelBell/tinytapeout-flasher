@@ -55,7 +55,7 @@ export function App() {
       <Stack component="main" maxWidth="100vw" minHeight="100vh" alignItems="center">
         <Header />
 
-        <Stack maxWidth="100%" width={600} flex="1" py={2}>
+        <Stack maxWidth="100%" width={755} flex="1" py={2}>
           <Typography variant="h6" component="div">
             Run TinyQV binaries on TT06 with QSPI Pmod
           </Typography>
