@@ -2,4 +2,4 @@
 // Copyright (C) 2024, Tiny Tapeout LTD
 // Author: Uri Shaked
 
-export const repo = 'https://github.com/TinyTapeout/tinytapeout-flasher';
+export const repo = 'https://github.com/MichaelBell/tinytapeout-flasher/tree/tinyQV';

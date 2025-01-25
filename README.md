@@ -1,8 +1,10 @@
-# TinyQV tinytapeout-flasher
+# TinyQV Programmer for TT06
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-TinyQV Tiny Tapeout Flasher lets you connect to a [Tiny Tapeout](https://www.tinytapeout.com) 06 Demo Board, flash a binary file to the SPI Flash memory in the QSPI Pmod and run it on the TinyQV Risc-V SoC. The QSPI Pmod has to be connected to the BIDIR (uio) Pmod port on the Tiny Tapeout board.
+TinyQV Programmer lets you connect to a [Tiny Tapeout](https://www.tinytapeout.com) 06 Demo Board and flash a binary file to the SPI Flash memory in the QSPI Pmod.  The QSPI Pmod has to be connected to the BIDIR (uio) Pmod port on the Tiny Tapeout board.
+
+You can then interact with the program running on the TinyQV Risc-V SoC in the console. 
 
 ## Local Development
 
