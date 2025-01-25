@@ -11,7 +11,8 @@ export const presets = [
   },
   {
     name: 'Micropython',
-    source: 'https://github.com/MichaelBell/micropython/tree/tinyQV',
+    source:
+      'https://github.com/MichaelBell/micropython/tree/tinyQV/ports/tinyQV#using-tinyqv-micropython',
     baseUrl: 'https://tt.rebel-lion.uk/tt06-tinyqv/',
     files: [{ offset: 0, name: 'micropython20250107.bin' }],
   },
