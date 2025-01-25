@@ -117,6 +117,11 @@ export function FlashPanel(props: IReplPanelProps) {
     }
   };
 
+  const linkTo = (preset: any) => {
+    if ('source' in preset) return <a href={preset.source}>{preset.name}</a>;
+    else return preset.name;
+  };
+
   return (
     <Stack spacing={1}>
       <Show when={programmingCompleted()}>
@@ -136,7 +141,11 @@ export function FlashPanel(props: IReplPanelProps) {
         >
           <For each={presets}>
             {(preset, index) => (
-              <FormControlLabel value={index()} control={<Radio />} label={preset.name} />
+              <FormControlLabel
+                value={index()}
+                control={<Radio />}
+                label={linkTo(preset)}
+              ></FormControlLabel>
             )}
           </For>
           <FormControlLabel value={CUSTOM_FIRMWARE} control={<Radio />} label="Custom" />
