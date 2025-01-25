@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "vite build --base /tinytapeout-flasher/",
+    "build": "vite build --base /",
     "test": "vitest",
     "prepare": "husky"
   },
