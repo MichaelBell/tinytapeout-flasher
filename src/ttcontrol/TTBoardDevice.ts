@@ -79,6 +79,8 @@ export class TTBoardDevice extends EventTarget {
 
   async detachTerminal() {
     this.terminalListener = null;
+    await this.writeText('\x11q\n'); // Send Ctrl+Q q to exit from TinyQV uart loop.
+    await this.waitUntil((line) => line.startsWith('TinyQV stop'));
     await this.writeText('\x03\x03'); // Send Ctrl+C twice to stop any running program.
     await this.writeText('\x01'); // Send Ctrl+A to enter RAW REPL mode.
     this.terminalDetachedResolve?.();
@@ -154,9 +156,12 @@ export class TTBoardDevice extends EventTarget {
     this.writableStreamClosed = textEncoderStream.readable.pipeTo(this.port.writable);
 
     // The following sequence tries to ensure clean reboot:
+    // Send Ctrl+Q q in case stuck inside previous TinyQV terminal
     // Send Ctrl+C twice to stop any running program,
     // followed by Ctrl+B to exit RAW REPL mode (if it was entered),
     // and finally Ctrl+D to soft reset the board.
+    await this.writeText('\x11q\n'); // Send Ctrl+Q q to exit from TinyQV uart loop.
+    await new Promise((f) => setTimeout(f, 200));
     await this.writeText('\x03\x03\x02');
     await this.writeText('\x04');
 

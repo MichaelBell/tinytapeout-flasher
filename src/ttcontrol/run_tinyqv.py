@@ -406,7 +406,7 @@ def setup_pmod():
     ram_a_sel = Pin(GPIO_UIO[6], Pin.OUT, value=1)
     ram_b_sel = Pin(GPIO_UIO[7], Pin.OUT, value=1)
 
-def run(query=False, stop=False):
+def run():
     machine.freq(128_000_000)
 
     Pin(GPIO_UIO[0], Pin.IN, pull=Pin.PULL_UP)
@@ -420,9 +420,6 @@ def run(query=False, stop=False):
 
     print()
     select_design(227)
-
-    if query:
-        input("Reset? ")
 
     # Pull up UART RX
     Pin(GPIO_UI_IN[7], Pin.IN, pull=Pin.PULL_UP)
@@ -482,66 +479,45 @@ def run(query=False, stop=False):
     time.sleep(0.001)
     clk.off()
 
-    sm = rp2.StateMachine(1, pio_capture, 128_000_000, in_base=Pin(GPIO_UIO[0]))
-
-    capture_len=1024
-    buf = bytearray(capture_len)
-
-    rx_dma = rp2.DMA()
-    c = rx_dma.pack_ctrl(inc_read=False, treq_sel=5) # Read using the SM0 RX DREQ
-    sm.restart()
-    sm.exec("wait(%d, gpio, %d)" % (1, GPIO_UIO[3]))
-    rx_dma.config(
-        read=0x5020_0024,        # Read from the SM1 RX FIFO
-        write=buf,
-        ctrl=c,
-        count=capture_len//4,
-        trigger=True
-    )
-    sm.active(1)
-
-    if query:
-        input("Start? ")
-
-    uart = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]))
+    uart = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
     time.sleep(0.001)
     clk = PWM(Pin(GPIO_PROJECT_CLK), freq=64_000_000, duty_u16=32768)
 
-    # Wait for DMA to complete
-    while rx_dma.active():
-        time.sleep_ms(1)
-        
-    sm.active(0)
-    del sm
-
-    if True:
+    try:
+        micropython.kbd_intr(-1)  # Disable Ctrl-C
         poll = uselect.poll()
         poll.register(sys.stdin, uselect.POLLIN)
+
+        CTRL_Q = 17
+        is_ctrl_q = False
 
         while True:
             if poll.poll(0):
                 c = sys.stdin.buffer.read(1)
 
+                #if c <= 26:
+                #    print(f"Ctrl-{chr(ord('A')+c-1)}")
+
+                if is_ctrl_q:
+                    if c[0] == ord('q') or c[0] == ord('Q'):
+                        break
+                    elif c[0] != CTRL_Q:
+                        continue
+                    is_ctrl_q = False
+                elif c[0] == CTRL_Q:  # Detect Ctrl-Q
+                    is_ctrl_q = True
+                    continue
+
                 # Repeat the character to workaround TinyQV bug
-                uart.write(c)
-                uart.write(c)
+                uart.write(c+c)
 
             uart_data = uart.read(128)
-            if uart_data:
+            while uart_data:
                 sys.stdout.write(uart_data)
-
-    if False:
-        for j in range(8):
-            print("%02d: " % (j+21,), end="")
-            for d in buf:
-                print("-" if (d & (1 << j)) != 0 else "_", end = "")
-            print()
-
-        print("SD: ", end="")
-        for d in buf:
-            nibble = ((d >> 1) & 1) | ((d >> 1) & 2) | ((d >> 2) & 0x4) | ((d >> 2) & 0x8)
-            print("%01x" % (nibble,), end="")
-        print()
+                uart_data = uart.read(128)
+    finally:
+        micropython.kbd_intr(3)
+        print("TinyQV stop")
 
 def program_flash(start_address):
     select_design(0)
