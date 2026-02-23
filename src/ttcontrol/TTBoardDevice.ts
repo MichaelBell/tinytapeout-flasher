@@ -216,8 +216,8 @@ export class TTBoardDevice extends EventTarget {
     }
   }
 
-  async runExistingProgram() {
-    await this.sendCommand(`run()`);
+  async runExistingProgram(design: Number, latency: Number, freq: Number) {
+    await this.sendCommand(`run(${design}, ${latency}, ${freq})`);
     await this.waitUntil((line) => line.startsWith('design='));
   }
 

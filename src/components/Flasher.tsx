@@ -44,6 +44,9 @@ export function FlashPanel(props: IReplPanelProps) {
   let fileInput: HTMLInputElement | undefined;
   const [selectedFirmware, setSelectedFirmware] = createSignal('0');
   const [flashOffset, setFlashOffset] = createSignal(0);
+  const [designNum, setDesignNum] = createSignal(227);
+  const [latencyCfg, setLatencyCfg] = createSignal(2);
+  const [frequencyCfg, setFrequencyCfg] = createSignal(64);
   const [programming, setProgramming] = createSignal(false);
   const [programmingCompleted, setProgrammingCompleted] = createSignal(false);
   const [customSize, setCustomSize] = createSignal(0);
@@ -119,7 +122,7 @@ export function FlashPanel(props: IReplPanelProps) {
 
   const doRun = async () => {
     setProgrammingCompleted(false);
-    await props.device.runExistingProgram();
+    await props.device.runExistingProgram(designNum(), latencyCfg(), frequencyCfg() * 1000000);
     setProgrammingCompleted(true);
   };
 
@@ -234,6 +237,72 @@ export function FlashPanel(props: IReplPanelProps) {
           <Typography>✅ Flashing complete</Typography>
         </Show>
       </Show>
+      <Stack direction="row" spacing={1}>
+        <Typography>
+          <TextField
+            sx={{ width: 100 }}
+            label="Design"
+            type="number"
+            size="small"
+            value={designNum()}
+            InputProps={{ inputProps: { min: 0, max: 999 } }}
+            fullWidth
+            onChange={(e) => {
+              setDesignNum((e.target as HTMLInputElement).valueAsNumber);
+            }}
+          />
+        </Typography>
+        <Typography>
+          <TextField
+            sx={{ width: 100 }}
+            label="Latency"
+            type="number"
+            size="small"
+            value={latencyCfg()}
+            InputProps={{ inputProps: { min: 1, max: 3 } }}
+            fullWidth
+            onChange={(e) => {
+              setLatencyCfg((e.target as HTMLInputElement).valueAsNumber);
+            }}
+          />
+        </Typography>
+        <Typography>
+          <TextField
+            sx={{ width: 130 }}
+            label="Frequency MHz"
+            type="number"
+            size="small"
+            value={frequencyCfg()}
+            InputProps={{ inputProps: { min: 1, max: 100 } }}
+            fullWidth
+            onChange={(e) => {
+              setFrequencyCfg((e.target as HTMLInputElement).valueAsNumber);
+            }}
+          />
+        </Typography>
+        <table>
+          <thead>
+            <tr>
+              <th>Tapeout</th>
+              <th>Design num</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TT06</td>
+              <td>227</td>
+            </tr>
+            <tr>
+              <td>TT IHP 0p2&nbsp;&nbsp;&nbsp;</td>
+              <td>514</td>
+            </tr>
+            <tr>
+              <td>TT IHP 25a</td>
+              <td>780</td>
+            </tr>
+          </tbody>
+        </table>
+      </Stack>
       <Stack direction="row" spacing={1}>
         <Button variant="contained" onClick={doFlash} disabled={programming()}>
           Flash and Run

@@ -406,8 +406,8 @@ def setup_pmod():
     ram_a_sel = Pin(GPIO_UIO[6], Pin.OUT, value=1)
     ram_b_sel = Pin(GPIO_UIO[7], Pin.OUT, value=1)
 
-def run():
-    machine.freq(128_000_000)
+def run(design, latency, freq):
+    machine.freq(freq * 2)
 
     Pin(GPIO_UIO[0], Pin.IN, pull=Pin.PULL_UP)
     Pin(GPIO_UIO[1], Pin.IN, pull=None)
@@ -419,7 +419,7 @@ def run():
     Pin(GPIO_UIO[7], Pin.IN, pull=Pin.PULL_UP)
 
     print()
-    select_design(227)
+    select_design(design)
 
     # Pull up UART RX
     Pin(GPIO_UI_IN[7], Pin.IN, pull=Pin.PULL_UP)
@@ -455,8 +455,8 @@ def run():
     flash_sel.off()
     ram_a_sel.off()
     ram_b_sel.off()
-    qspi_sd0.off()
-    qspi_sd1.on()
+    qspi_sd0.value((latency & 1) == 1)
+    qspi_sd1.value((latency & 2) == 2)
     qspi_sd2.off()
     qspi_sd3.off()
 
@@ -479,9 +479,9 @@ def run():
     time.sleep(0.001)
     clk.off()
 
-    uart = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
+    uart = UART(1, baudrate=int(115200 * (freq / 64_000_000)), tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
     time.sleep(0.001)
-    clk = PWM(Pin(GPIO_PROJECT_CLK), freq=64_000_000, duty_u16=32768)
+    clk = PWM(Pin(GPIO_PROJECT_CLK), freq=freq, duty_u16=32768)
 
     try:
         micropython.kbd_intr(-1)  # Disable Ctrl-C
@@ -508,8 +508,11 @@ def run():
                     is_ctrl_q = True
                     continue
 
-                # Repeat the character to workaround TinyQV bug
-                uart.write(c+c)
+                if design == 227:
+                    # Repeat the character to workaround TT06 TinyQV bug
+                    uart.write(c+c)
+                else:
+                    uart.write(c)
 
             uart_data = uart.read(128)
             while uart_data:
