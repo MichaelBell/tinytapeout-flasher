@@ -177,6 +177,9 @@ export class TTBoardDevice extends EventTarget {
   async programFlash(
     offset: number,
     data: ArrayBufferLike,
+    design: Number,
+    latency: Number,
+    freq: Number,
     onProgress?: (written: number, total: number) => void,
   ) {
     const lineListener = this.addLineListener((line) => {
@@ -209,7 +212,7 @@ export class TTBoardDevice extends EventTarget {
       await this.writeBinary(new TextEncoder().encode(`0\r\n`));
       const response = await waitForFlashProg();
 
-      await this.sendCommand(`run()`);
+      await this.sendCommand(`run(${design}, ${latency}, ${freq})`);
       await this.waitUntil((line) => line.startsWith('design='));
     } finally {
       lineListener.abort();

@@ -75,9 +75,16 @@ export function FlashPanel(props: IReplPanelProps) {
         }
         const buffer = await file.arrayBuffer();
         setCustomSize(buffer.byteLength);
-        await props.device.programFlash(flashOffset(), buffer, (progress) => {
-          setCustomProgress(progress);
-        });
+        await props.device.programFlash(
+          flashOffset(),
+          buffer,
+          designNum(),
+          latencyCfg(),
+          frequencyCfg() * 1000000,
+          (progress) => {
+            setCustomProgress(progress);
+          },
+        );
         setProgrammingCompleted(true);
         return;
       }
@@ -105,9 +112,16 @@ export function FlashPanel(props: IReplPanelProps) {
 
       for (const { name, offset, data } of fileData) {
         updateFileStatus(name, 'Flashing...');
-        await props.device.programFlash(offset, data, (progress) => {
-          updateFileStatus(name, { written: progress, flashing: true });
-        });
+        await props.device.programFlash(
+          offset,
+          data,
+          designNum(),
+          latencyCfg(),
+          frequencyCfg() * 1000000,
+          (progress) => {
+            updateFileStatus(name, { written: progress, flashing: true });
+          },
+        );
         updateFileStatus(name, {
           flashing: false,
           status: `✅ ${toKB(data.byteLength)} kB`,
