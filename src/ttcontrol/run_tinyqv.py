@@ -10,15 +10,15 @@ import binascii
 
 print("\n\nRun TinyQV Begin")
 
-# GPIO mapping for TT 06+ demo board
-GPIO_PROJECT_CLK = 0
-GPIO_PROJECT_RST_N = 1
-GPIO_CTRL_ENA = 4
-GPIO_CTRL_RST_N = 2
-GPIO_CTRL_INC = 3
-GPIO_UI_IN = [9, 10, 11, 12, 17, 18, 19, 20]
-GPIO_UIO = [21, 22, 23, 24, 25, 26, 27, 28]
-GPIO_UO_OUT = [5, 6, 7, 8, 13, 14, 15, 16]
+# GPIO mapping for TT ETR v3.2 demo board
+GPIO_PROJECT_CLK = 14
+GPIO_PROJECT_RST_N = 16
+GPIO_CTRL_ENA = 0
+GPIO_CTRL_RST_N = 1
+GPIO_CTRL_INC = 2
+GPIO_UI_IN = [17, 18, 19, 20, 21, 22, 23, 24]
+GPIO_UIO = [25, 26, 27, 28, 29, 30, 31, 32]
+GPIO_UO_OUT = [33, 34, 35, 36, 37, 38, 39, 40]
 
 clk_pin = Pin(GPIO_PROJECT_CLK, Pin.IN, Pin.PULL_DOWN)
 proj_rst_n = Pin(GPIO_PROJECT_RST_N, Pin.IN, Pin.PULL_UP)

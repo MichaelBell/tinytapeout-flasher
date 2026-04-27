@@ -44,7 +44,7 @@ export function FlashPanel(props: IReplPanelProps) {
   let fileInput: HTMLInputElement | undefined;
   const [selectedFirmware, setSelectedFirmware] = createSignal('0');
   const [flashOffset, setFlashOffset] = createSignal(0);
-  const [designNum, setDesignNum] = createSignal(227);
+  const [designNum, setDesignNum] = createSignal(495);
   const [latencyCfg, setLatencyCfg] = createSignal(2);
   const [frequencyCfg, setFrequencyCfg] = createSignal(64);
   const [programming, setProgramming] = createSignal(false);
@@ -303,16 +303,16 @@ export function FlashPanel(props: IReplPanelProps) {
           </thead>
           <tbody>
             <tr>
-              <td>TT06</td>
-              <td>227</td>
+              <td>TT Sky 25a Asteroids</td>
+              <td>495</td>
             </tr>
             <tr>
-              <td>TT IHP 0p2&nbsp;&nbsp;&nbsp;</td>
-              <td>514</td>
+              <td>TT Sky 25a Berzerk</td>
+              <td>687</td>
             </tr>
             <tr>
-              <td>TT IHP 25a</td>
-              <td>780</td>
+              <td>TT GF 0p2</td>
+              <td>39</td>
             </tr>
           </tbody>
         </table>
