@@ -11,8 +11,8 @@ import binascii
 print("\n\nRun TinyQV Begin")
 
 # GPIO mapping for TT ETR v3.2 demo board
-GPIO_PROJECT_CLK = 14
-GPIO_PROJECT_RST_N = 16
+GPIO_PROJECT_CLK = 16
+GPIO_PROJECT_RST_N = 14
 GPIO_CTRL_ENA = 0
 GPIO_CTRL_RST_N = 1
 GPIO_CTRL_INC = 2
