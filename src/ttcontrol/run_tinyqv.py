@@ -479,7 +479,8 @@ def run(design, latency, freq):
     time.sleep(0.001)
     clk.off()
 
-    uart = UART(0, baudrate=int(115200 * (freq / 24_000_000)), tx=Pin(GPIO_UI_IN[1]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
+    uart_out = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=None, cts=Pin(GPIO_UO_OUT[5]), flow=UART.CTS)
+    uart_in = UART(0, baudrate=115200, rx=Pin(GPIO_UO_OUT[0]), tx=None)
     time.sleep(0.001)
     clk = PWM(Pin(GPIO_PROJECT_CLK), freq=freq, duty_u16=32768)
 
@@ -508,16 +509,12 @@ def run(design, latency, freq):
                     is_ctrl_q = True
                     continue
 
-                if design == 227:
-                    # Repeat the character to workaround TT06 TinyQV bug
-                    uart.write(c+c)
-                else:
-                    uart.write(c)
+                uart_out.write(c)
 
-            uart_data = uart.read(128)
+            uart_data = uart_in.read(128)
             while uart_data:
                 sys.stdout.write(uart_data)
-                uart_data = uart.read(128)
+                uart_data = uart_in.read(128)
     finally:
         micropython.kbd_intr(3)
         print("TinyQV stop")
