@@ -479,7 +479,7 @@ def run(design, latency, freq):
     time.sleep(0.001)
     clk.off()
 
-    #uart = UART(0, baudrate=int(115200 * (freq / 24_000_000)), tx=Pin(GPIO_UI_IN[7]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
+    uart = UART(0, baudrate=int(115200 * (freq / 24_000_000)), tx=Pin(GPIO_UI_IN[1]), rx=Pin(GPIO_UO_OUT[0]), cts=Pin(GPIO_UO_OUT[1]), flow=UART.CTS)
     time.sleep(0.001)
     clk = PWM(Pin(GPIO_PROJECT_CLK), freq=freq, duty_u16=32768)
 
