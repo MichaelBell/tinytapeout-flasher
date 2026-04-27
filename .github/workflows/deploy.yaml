@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - tinyQV
+      - tinyQV-sky25a
 
 jobs:
   deploy:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: tinyQV
+          ref: tinyQV-sky25a
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
