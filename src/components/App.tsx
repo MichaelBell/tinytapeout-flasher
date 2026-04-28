@@ -57,11 +57,11 @@ export function App() {
 
         <Stack maxWidth="100%" width={755} flex="1" py={2}>
           <Typography variant="h6" component="div">
-            Run TinyQV binaries on TT06 with QSPI Pmod
+            Run TinyQV binaries on TT sky25a or gf0p2 with QSPI Pmod
           </Typography>
 
           <Typography variant="body1" color="text.secondary" gutterBottom>
-            For Tiny Tapeout 06 demo board with a QSPI Pmod attached.
+            For Tiny Tapeout ETR demo board with a QSPI Pmod attached.
           </Typography>
 
           <Show when={!supported()}>

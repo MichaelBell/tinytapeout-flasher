@@ -12,7 +12,7 @@ export const presets = [
   {
     name: 'Micropython',
     source:
-      'https://github.com/MichaelBell/micropython/tree/tinyQV/ports/tinyQV#using-tinyqv-micropython',
+      'https://github.com/MichaelBell/micropython/tree/tinyqv-sky25a/ports/tinyQV#using-tinyqv-micropython',
     baseUrl: 'https://tt.rebel-lion.uk/ttsky25a-tinyqv/',
     files: [{ offset: 0, name: 'micropython20260427.bin' }],
   },
