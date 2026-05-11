@@ -479,8 +479,13 @@ def run(design, latency, freq):
     time.sleep(0.001)
     clk.off()
 
-    uart_out = UART(1, baudrate=115200, tx=Pin(GPIO_UI_IN[7]), rx=None, cts=Pin(GPIO_UO_OUT[5]), flow=UART.CTS)
-    uart_in = UART(0, baudrate=115200, rx=Pin(GPIO_UO_OUT[0]), tx=None)
+    if design == 39:  # GF 0p2 is slow, really needs CTS.  Default freq is 24MHz, so adjust baudrate accordingly
+        baud = int(115200 * freq / 24000000)
+        uart_out = UART(1, baudrate=baud, tx=Pin(GPIO_UI_IN[7]), rx=None, cts=Pin(GPIO_UO_OUT[5]), flow=UART.CTS)
+    else:
+        baud = int(115200 * freq / 64000000)
+        uart_out = UART(1, baudrate=baud, tx=Pin(GPIO_UI_IN[7]), rx=None)
+    uart_in = UART(0, baudrate=baud, rx=Pin(GPIO_UO_OUT[0]), tx=None)
     time.sleep(0.001)
     clk = PWM(Pin(GPIO_PROJECT_CLK), freq=freq, duty_u16=32768)
 
