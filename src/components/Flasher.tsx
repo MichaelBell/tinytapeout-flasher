@@ -314,6 +314,10 @@ export function FlashPanel(props: IReplPanelProps) {
               <td>TT GF 0p2</td>
               <td>39</td>
             </tr>
+            <tr>
+              <td>TT Sky 25b FemtoRV</td>
+              <td>514</td>
+            </tr>
           </tbody>
         </table>
       </Stack>

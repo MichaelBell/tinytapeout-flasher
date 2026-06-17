@@ -482,6 +482,9 @@ def run(design, latency, freq):
     if design == 39:  # GF 0p2 is slow, really needs CTS.  Default freq is 24MHz, so adjust baudrate accordingly
         baud = int(115200 * freq / 24000000)
         uart_out = UART(1, baudrate=baud, tx=Pin(GPIO_UI_IN[7]), rx=None, cts=Pin(GPIO_UO_OUT[5]), flow=UART.CTS)
+    elif design == 514:  # For FemtoRV on TT sky25b
+        baud = int(115200 * freq / 50000000)
+        uart_out = UART(1, baudrate=baud, tx=Pin(GPIO_UI_IN[7]), rx=None)
     else:
         baud = int(115200 * freq / 64000000)
         uart_out = UART(1, baudrate=baud, tx=Pin(GPIO_UI_IN[7]), rx=None)
