@@ -14,7 +14,7 @@ export const presets = [
     source:
       'https://github.com/MichaelBell/micropython/tree/tinyqv-sky25a/ports/tinyQV#using-tinyqv-micropython',
     baseUrl: 'https://tt.rebel-lion.uk/ttsky25a-tinyqv/',
-    files: [{ offset: 0, name: 'micropython20260626.bin' }],
+    files: [{ offset: 0, name: 'micropython20260728.bin' }],
   },
   {
     name: 'Coremark',

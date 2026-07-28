@@ -315,8 +315,8 @@ export function FlashPanel(props: IReplPanelProps) {
               <td>39</td>
             </tr>
             <tr>
-              <td>TT IHP 25a</td>
-              <td>780</td>
+              <td>TT IHP 25b</td>
+              <td>490</td>
             </tr>
             <tr>
               <td>TT Sky 25b FemtoRV</td>
